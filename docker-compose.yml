@@ -1,0 +1,67 @@
+
+services:
+    auth-service-db:
+      image: postgres:17
+      environment:
+        POSTGRES_USER: admin_user
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: authdb
+      ports:
+        - "5000:5432"
+      networks:
+        - internal
+      volumes:
+        - auth-db-data:/var/lib/postgresql/data
+
+    kafka:
+      image: apache/kafka:latest
+      environment:
+        KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+        KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+        KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+        KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
+        KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+        KAFKA_NODE_ID: 1
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        KAFKA_PROCESS_ROLES: broker,controller
+        KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      networks:
+        - internal
+      ports:
+        - "9094:9094"
+
+
+    auth-service:
+      build:
+        context: ./auth-service
+        dockerfile: Dockerfile
+      depends_on:
+        - auth-service-db
+        - kafka
+      ports:
+        - "4000:4000"
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://auth-service-db:5432/authdb
+        SPRING_DATASOURCE_USERNAME: admin_user
+        SPRING_DATASOURCE_PASSWORD: password
+        SPRING_JPA_HIBERNATE_DDL_AUTO: update
+        SPRING_SQL_INIT_MODE: always
+        SERVER_PORT: 4000
+        JWT_SECRET: iusacbhhcwhjfKn8723t847y8923yhfijgaeuiksjn75985788358jhrbjhbgjk
+      networks:
+        - internal
+
+
+volumes:
+  auth-db-data:
+
+networks:
+  internal:
+
+
+
+
+
+
