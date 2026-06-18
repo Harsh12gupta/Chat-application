@@ -49,6 +49,7 @@ services:
         SPRING_JPA_HIBERNATE_DDL_AUTO: update
         SPRING_SQL_INIT_MODE: always
         SERVER_PORT: 4000
+        SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
         JWT_SECRET: iusacbhhcwhjfKn8723t847y8923yhfijgaeuiksjn75985788358jhrbjhbgjk
       networks:
         - internal

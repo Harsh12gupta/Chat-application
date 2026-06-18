@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option java_multiple_files= true;
+package user.events;
+
+message UserRegisteredEvent{
+  string email = 1;
+  string id = 2;
+  string event_type = 3;
+}

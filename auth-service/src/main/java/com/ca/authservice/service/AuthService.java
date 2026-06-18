@@ -7,6 +7,7 @@ import com.ca.authservice.dto.RegisterResponseDTO;
 import com.ca.authservice.exception.EmailAlreadyExistsException;
 import com.ca.authservice.exception.InvalidPasswordException;
 import com.ca.authservice.exception.UserNotFoundException;
+import com.ca.authservice.kafka.KafkaProducer;
 import com.ca.authservice.mapper.UserMapper;
 import com.ca.authservice.model.User;
 import com.ca.authservice.repository.UserRepository;
@@ -21,11 +22,13 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final KafkaProducer kafkaProducer;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,JwtUtil jwtUtil){
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,JwtUtil jwtUtil,KafkaProducer kafkaProducer){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.kafkaProducer = kafkaProducer;
     }
 
     public RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO){
@@ -38,6 +41,7 @@ public class AuthService {
         String hashPassword = passwordEncoder.encode(password);
         registerRequestDTO.setPassword(hashPassword);
         User user = userRepository.save(UserMapper.toModel(registerRequestDTO));
+        kafkaProducer.sendUserRegisteredEvent(user);
         return UserMapper.toDTO(user);
     }
 
