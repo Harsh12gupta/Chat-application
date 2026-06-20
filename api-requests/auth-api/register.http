@@ -1,5 +1,5 @@
 ### POST request for registering user
-POST http://localhost:4000/register
+POST http://localhost:4000/auth/register
 Content-Type: application/json
 
 {
