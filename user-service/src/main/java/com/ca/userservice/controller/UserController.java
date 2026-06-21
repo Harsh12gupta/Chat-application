@@ -21,14 +21,14 @@ public class UserController {
         this.userProfileService = userProfileService;
     }
 
-    @GetMapping("/me/{id}")
-    public ResponseEntity<MyProfileResponseDTO> getMyProfile(@PathVariable UUID id){
+    @GetMapping("/me")
+    public ResponseEntity<MyProfileResponseDTO> getMyProfile(@RequestHeader("X-User-Id") UUID id){
         return ResponseEntity.ok().body(userProfileService.getMyProfile(id));
     }
 
-    @PutMapping("/me/{id}")
+    @PutMapping("/me")
     public ResponseEntity<MyProfileResponseDTO> updateMyProfile(@Valid @RequestBody UpdateUserProfileRequestDTO updateUserProfileRequestDTO,
-                                                                @PathVariable UUID id){
+                                                                @RequestHeader("X-User-Id") UUID id){
         return ResponseEntity.ok().body(userProfileService.updateMyProfile(updateUserProfileRequestDTO,id));
     }
 
