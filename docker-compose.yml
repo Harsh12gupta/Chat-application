@@ -13,6 +13,19 @@ services:
       volumes:
         - auth-db-data:/var/lib/postgresql/data
 
+    user-service-db:
+      image: postgres:17
+      environment:
+        POSTGRES_USER: admin_user
+        POSTGRES_DB: userdb
+        POSTGRES_PASSWORD: password
+      ports:
+        - "5001:5432"
+      networks:
+        - internal
+      volumes:
+        - user-db-data:/var/lib/postgresql/data
+
     kafka:
       image: apache/kafka:latest
       environment:
@@ -31,7 +44,6 @@ services:
         - internal
       ports:
         - "9094:9094"
-
 
     auth-service:
       build:
@@ -54,9 +66,31 @@ services:
       networks:
         - internal
 
+    user-service:
+      build:
+        context: ./user-service
+        dockerfile: Dockerfile
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://user-service-db:5432/userdb
+        SPRING_DATASOURCE_USERNAME: admin_user
+        SPRING_DATASOURCE_PASSWORD: password
+        SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+        SERVER_PORT: 4001
+        SPRING_JPA_HIBERNATE_DDL_AUTO: update
+        SPRING_SQL_INIT_MODE: always
+      ports:
+        - "4001:4001"
+      networks:
+        - internal
+      depends_on:
+        - user-service-db
+        - kafka
+        - auth-service-db
+        - auth-service
 
 volumes:
   auth-db-data:
+  user-db-data:
 
 networks:
   internal:

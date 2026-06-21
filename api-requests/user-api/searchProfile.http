@@ -1,0 +1,2 @@
+##GET users with similar user names
+GET http://localhost:4001/user/search?username=harsh

@@ -51,4 +51,16 @@ public class UserProfileService {
             return UserMapper.toUserProfileResDTO(userProfile);
         }).toList();
     }
+
+    public void createProfile(String email,String id){
+        UserProfile userProfile = new UserProfile();
+        //if kafka send same event twice to the consumer
+        if(userProfileRepository.existsById(UUID.fromString(id)) || userProfileRepository.existsByEmail(email)){
+            return;
+        }
+        userProfile.setEmail(email);
+        userProfile.setUsername("user_"+id);
+        userProfile.setId(UUID.fromString(id));
+        userProfileRepository.save(userProfile);
+    }
 }

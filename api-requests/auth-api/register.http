@@ -3,8 +3,9 @@ POST http://localhost:4000/auth/register
 Content-Type: application/json
 
 {
-  "email": "test12@gamil.com",
+  "email": "test22@gamil.com",
   "password": "12345678"
 }
 
+> {% client.global.set("id",response.body.id) %}
 ###

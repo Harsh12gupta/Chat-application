@@ -1,0 +1,8 @@
+#updating user profile
+PUT http://localhost:4001/user/me/{{id}}
+Content-Type: application/json
+
+{
+  "username": "harsh22",
+  "displayName": "harsh22_gupta"
+}
