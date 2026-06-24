@@ -1,2 +1,3 @@
 #Getting user profile
-GET http://localhost:4001/user/me/{{id}}
+GET http://localhost:4002/user/me
+Authorization: Bearer {{token}}

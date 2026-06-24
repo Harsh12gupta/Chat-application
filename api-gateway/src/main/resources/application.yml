@@ -1,0 +1,19 @@
+server:
+  port: 4002
+
+spring:
+  cloud:
+    gateway:
+      routes:
+
+        - id: auth-service-route
+          uri: http://auth-service:4000
+          predicates:
+            - Path=/auth/**
+
+        - id: user-service-route
+          uri: http://user-service:4001
+          predicates:
+            - Path=/user/**
+          filters:
+            - JwtValidation

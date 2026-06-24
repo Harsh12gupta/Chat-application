@@ -1,8 +1,9 @@
 #updating user profile
-PUT http://localhost:4001/user/me/{{id}}
+PUT http://localhost:4002/user/me
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
-  "username": "harsh22",
-  "displayName": "harsh22_gupta"
+  "username": "harsh1",
+  "displayName": "harsh1_gupta"
 }

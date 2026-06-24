@@ -2,7 +2,6 @@
 services:
     auth-service-db:
       image: postgres:17
-      container_name: auth-service-db
       environment:
         POSTGRES_USER: admin_user
         POSTGRES_PASSWORD: password
@@ -16,7 +15,6 @@ services:
 
     user-service-db:
       image: postgres:17
-      container_name: user-service-db
       environment:
         POSTGRES_USER: admin_user
         POSTGRES_DB: userdb
@@ -30,7 +28,6 @@ services:
 
     kafka:
       image: apache/kafka:latest
-      container_name: kafka
       environment:
         KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
         KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
@@ -49,7 +46,6 @@ services:
         - "9094:9094"
 
     auth-service:
-      container_name: auth-service
       build:
         context: ./auth-service
         dockerfile: Dockerfile
@@ -71,7 +67,6 @@ services:
         - internal
 
     user-service:
-      container_name: user-service
       build:
         context: ./user-service
         dockerfile: Dockerfile
@@ -92,6 +87,18 @@ services:
         - kafka
         - auth-service-db
         - auth-service
+
+    api-gateway:
+      build:
+        context: ./api-gateway
+        dockerfile: Dockerfile
+      environment:
+        SERVER_PORT: 4002
+        JWT_SECRET: iusacbhhcwhjfKn8723t847y8923yhfijgaeuiksjn75985788358jhrbjhbgjk
+      networks:
+        - internal
+      ports:
+        - "4002:4002"
 
 volumes:
   auth-db-data:

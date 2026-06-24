@@ -5,6 +5,8 @@ import com.ca.userservice.dto.UpdateUserProfileRequestDTO;
 import com.ca.userservice.dto.UserProfileResponseDTO;
 import com.ca.userservice.service.UserProfileService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,7 @@ import java.util.UUID;
 @RequestMapping("/user")
 public class UserController {
 
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserProfileService userProfileService;
 
     public UserController(UserProfileService userProfileService){
@@ -23,6 +26,7 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<MyProfileResponseDTO> getMyProfile(@RequestHeader("X-User-Id") UUID id){
+        log.info("X-User-Id is {}",id);
         return ResponseEntity.ok().body(userProfileService.getMyProfile(id));
     }
 
