@@ -6,6 +6,7 @@ import com.ca.chatservice.mapper.ConvMapper;
 import com.ca.chatservice.model.Conversation;
 import com.ca.chatservice.repository.ConversationRepository;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ public class ChatService {
         this.conversationRepository = conversationRepository;
     }
 
-    public ConversationResponseDTO createConversation(CreateConversationRequestDTO
+    public Mono<ConversationResponseDTO> createConversation(CreateConversationRequestDTO
                                                               createConversationRequestDTO, UUID id){
         Conversation conversation = new Conversation();
         conversation.setName(createConversationRequestDTO.getName());
@@ -27,11 +28,10 @@ public class ChatService {
         admins.add(id);
         conversation.setAdmins(admins);
         conversation.setType(createConversationRequestDTO.getType());
-        if(!createConversationRequestDTO.getParticipants().contains(id)){
-            createConversationRequestDTO.getParticipants().add(id);
-        }
-        conversation.setParticipants(createConversationRequestDTO.getParticipants());
-        conversationRepository.save(conversation);
-        return ConvMapper.toConvResDTO(conversation);
+        List<UUID> participants = new ArrayList<>(createConversationRequestDTO.getParticipants());
+        participants.add(id);
+        participants = participants.stream().distinct().toList();
+        conversation.setParticipants(participants);
+        return conversationRepository.save(conversation).map(ConvMapper::toConvResDTO);
     }
 }
