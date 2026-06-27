@@ -6,13 +6,13 @@ import java.util.UUID;
 
 public class AddParticipantsRequestDTO {
     @NotNull
-    private List<UUID> participants;
+    private List<UUID> participantsToAdd;
 
-    public List<UUID> getParticipants() {
-        return participants;
+    public List<UUID> getParticipantsToAdd() {
+        return participantsToAdd;
     }
 
-    public void setParticipants(List<UUID> participants) {
-        this.participants = participants;
+    public void setParticipantsToAdd(List<UUID> participantsToAdd) {
+        this.participantsToAdd = participantsToAdd;
     }
 }

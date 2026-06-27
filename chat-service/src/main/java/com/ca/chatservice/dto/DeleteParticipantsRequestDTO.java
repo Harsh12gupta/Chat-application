@@ -8,13 +8,13 @@ import java.util.UUID;
 public class DeleteParticipantsRequestDTO {
 
     @NotNull
-    private List<UUID> participants;
+    private List<UUID> participantsToDelete;
 
-    public List<UUID> getParticipants() {
-        return participants;
+    public List<UUID> getParticipantsToDelete() {
+        return participantsToDelete;
     }
 
-    public void setParticipants(List<UUID> participants) {
-        this.participants = participants;
+    public void setParticipantsToDelete(List<UUID> participantsToDelete) {
+        this.participantsToDelete = participantsToDelete;
     }
 }
