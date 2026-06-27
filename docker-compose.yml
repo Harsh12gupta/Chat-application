@@ -26,6 +26,18 @@ services:
       volumes:
         - user-db-data:/var/lib/postgresql/data
 
+    chat-service-db:
+      image: mongo:8
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: admin_user
+        MONGO_INITDB_ROOT_PASSWORD: password
+      ports:
+        - "27017:27017"
+      networks:
+        - internal
+      volumes:
+        - chat-db-data:/data/db
+
     kafka:
       image: apache/kafka:latest
       environment:
@@ -103,6 +115,7 @@ services:
 volumes:
   auth-db-data:
   user-db-data:
+  chat-db-data:
 
 networks:
   internal:
