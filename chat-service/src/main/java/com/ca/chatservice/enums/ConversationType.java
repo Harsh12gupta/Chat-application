@@ -1,4 +1,4 @@
-package com.ca.chatservice;
+package com.ca.chatservice.enums;
 
 public enum ConversationType {
     DIRECT,
