@@ -1,6 +1,7 @@
 package com.ca.chatservice.dto;
 
-import com.ca.chatservice.ConversationType;
+import com.ca.chatservice.enums.ConversationType;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -16,6 +17,7 @@ public class CreateConversationRequestDTO {
     @NotNull
     private ConversationType type;
 
+    @NotBlank
     private String name;
 
     public List<UUID> getParticipants() {
