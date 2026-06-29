@@ -11,13 +11,13 @@ import java.util.UUID;
 public class CreateConversationRequestDTO {
 
     @NotNull
-    @Size(min = 2)
+    @Size(min = 2,message = "atleast 2 partcicpants are required")
     private List<UUID> participants;
 
-    @NotNull
+    @NotNull(message = "Type of the conversation is required")
     private ConversationType type;
 
-    @NotBlank
+    @NotBlank(message = "name of the conversation is required")
     private String name;
 
     public List<UUID> getParticipants() {
