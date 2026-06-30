@@ -1,5 +1,6 @@
 package com.ca.chatservice.model;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,6 +17,7 @@ public class Message {
 
     private UUID senderId;
 
+    @CreatedDate
     private Instant sentAt;
 
     private String content;
