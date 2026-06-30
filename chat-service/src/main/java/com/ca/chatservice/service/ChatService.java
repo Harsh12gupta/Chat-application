@@ -3,6 +3,7 @@ package com.ca.chatservice.service;
 import com.ca.chatservice.dto.AddAdminRequestDTO;
 import com.ca.chatservice.dto.ConversationResponseDTO;
 import com.ca.chatservice.dto.CreateConversationRequestDTO;
+import com.ca.chatservice.dto.RemoveAdminRequestDTO;
 import com.ca.chatservice.enums.ConversationType;
 import com.ca.chatservice.exception.ConversationNotFoundException;
 import com.ca.chatservice.exception.BadRequestException;
@@ -69,6 +70,32 @@ public class ChatService {
                     List<UUID> newAdmins = new ArrayList<>(conversation.getAdmins());
                     newAdmins.addAll(addAdminRequestDTO.getAdminsToAdd());
                     newAdmins = newAdmins.stream().distinct().toList();
+                    conversation.setAdmins(newAdmins);
+                    return conversationRepository.save(conversation);
+                }).map(ConvMapper::toConvResDTO);
+    }
+
+    public Mono<ConversationResponseDTO> removeAdmins(RemoveAdminRequestDTO removeAdminRequestDTO,UUID adminId,
+                                                      String conversationId){
+        return conversationRepository.
+                findById(conversationId).
+                switchIfEmpty(Mono.error(new ConversationNotFoundException("Conversation:"+conversationId+" does not exist"))).
+                flatMap(conversation -> {
+                    if(conversation.getType() == ConversationType.DIRECT){
+                        throw new BadRequestException("remove admin functinality is not available for DIRECT Groups");
+                    }
+
+                    if(!conversation.getAdmins().contains(adminId)){
+                        throw new UnAuthorizedUserException("User:"+adminId+" is not an admin");
+                    }
+
+                    List<UUID> newAdmins = new ArrayList<>(conversation.getAdmins());
+                    for(UUID remAdmin:removeAdminRequestDTO.getAdminsToRemove()){
+                        newAdmins.remove(remAdmin);
+                    }
+                    if(newAdmins.isEmpty()){
+                        throw new BadRequestException("there should be atleast 1 admin remaining");
+                    }
                     conversation.setAdmins(newAdmins);
                     return conversationRepository.save(conversation);
                 }).map(ConvMapper::toConvResDTO);
