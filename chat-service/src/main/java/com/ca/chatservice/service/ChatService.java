@@ -1,9 +1,6 @@
 package com.ca.chatservice.service;
 
-import com.ca.chatservice.dto.AddAdminRequestDTO;
-import com.ca.chatservice.dto.ConversationResponseDTO;
-import com.ca.chatservice.dto.CreateConversationRequestDTO;
-import com.ca.chatservice.dto.RemoveAdminRequestDTO;
+import com.ca.chatservice.dto.*;
 import com.ca.chatservice.enums.ConversationType;
 import com.ca.chatservice.exception.ConversationNotFoundException;
 import com.ca.chatservice.exception.BadRequestException;
@@ -97,6 +94,72 @@ public class ChatService {
                         throw new BadRequestException("there should be atleast 1 admin remaining");
                     }
                     conversation.setAdmins(newAdmins);
+                    return conversationRepository.save(conversation);
+                }).map(ConvMapper::toConvResDTO);
+    }
+
+    public Mono<ConversationResponseDTO> addParticipants(AddParticipantsRequestDTO addParticipantsRequestDTO,UUID adminId,
+                                                         String conversationId){
+        return conversationRepository.
+                findById(conversationId).
+                switchIfEmpty(Mono.error(new ConversationNotFoundException("Conversation:"+conversationId+" does not exist")))
+                .flatMap(conversation -> {
+                    if(conversation.getType() == ConversationType.DIRECT){
+                        throw new BadRequestException("DIRECT Groups can only have 2 participants");
+                    }
+                    if(!conversation.getAdmins().contains(adminId)){
+                        throw new UnAuthorizedUserException("User:"+adminId+" is not an admin");
+                    }
+                    List<UUID> newParticipants = new ArrayList<>(addParticipantsRequestDTO.getParticipantsToAdd());
+                    newParticipants.addAll(conversation.getParticipants());
+                    newParticipants = newParticipants.stream().distinct().toList();
+                    conversation.setParticipants(newParticipants);
+                    return conversationRepository.save(conversation);
+                }).map(ConvMapper::toConvResDTO);
+    }
+
+    public Mono<ConversationResponseDTO> remParticipants(DeleteParticipantsRequestDTO deleteParticipantsRequestDTO,UUID adminId,
+                                                         String conversationId){
+        return conversationRepository.
+                findById(conversationId).
+                switchIfEmpty(Mono.error(new ConversationNotFoundException("Conversation:"+conversationId+" does not exist"))).
+                flatMap(conversation -> {
+                    if(conversation.getType() == ConversationType.DIRECT){
+                        throw new BadRequestException("Cant remove participants from a DIRECT group");
+                    }
+                    if(!conversation.getAdmins().contains(adminId)){
+                        throw new UnAuthorizedUserException("User:"+adminId+" is not an admin");
+                    }
+
+                    List<UUID> newParticipants = new ArrayList<>(conversation.getParticipants());
+                    List<UUID> newAdmins = new ArrayList<>(conversation.getAdmins());
+                    for(UUID participant: deleteParticipantsRequestDTO.getParticipantsToDelete()){
+                        if(newParticipants.contains(participant)){
+                            newParticipants.remove(participant);
+                            if(newAdmins.contains(participant)){
+                                newAdmins.remove(participant);
+                            }
+                        }
+                    }
+                    if(newAdmins.isEmpty()){
+                        throw new BadRequestException("there should be atleast 1 admin in the group.");
+                    }
+                    conversation.setParticipants(newParticipants);
+                    conversation.setAdmins(newAdmins);
+                    return conversationRepository.save(conversation);
+                }).map(ConvMapper::toConvResDTO);
+    }
+
+    public Mono<ConversationResponseDTO> updateName(UpdateConversationNameRequestDTO updateConversationNameRequestDTO,UUID adminId,
+                                                    String conversationId){
+        return conversationRepository.
+                findById(conversationId).
+                switchIfEmpty(Mono.error(new ConversationNotFoundException("Conversation:"+conversationId+" does not exist"))).
+                flatMap(conversation -> {
+                    if(!conversation.getAdmins().contains(adminId)){
+                        throw new UnAuthorizedUserException("User:"+adminId+" is not an admin");
+                    }
+                    conversation.setName(updateConversationNameRequestDTO.getName());
                     return conversationRepository.save(conversation);
                 }).map(ConvMapper::toConvResDTO);
     }
